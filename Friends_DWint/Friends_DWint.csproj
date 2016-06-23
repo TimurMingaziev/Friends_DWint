@@ -35,6 +35,9 @@
     <ApplicationIcon>c_eu5rpDJ5E.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -50,9 +53,14 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="VkNet">
+      <HintPath>..\packages\VkNet.1.21.0\lib\net40\VkNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\City.cs" />
     <Compile Include="Classes\ClassQueries.cs" />
+    <Compile Include="Classes\Country.cs" />
     <Compile Include="Classes\User.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
