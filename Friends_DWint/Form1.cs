@@ -79,37 +79,69 @@ namespace Friends_DWint
         public void checkFiltr(List<string> ids)
         {
             string jfield2 = "";
+            JToken jtoken2 = null;
             if (ids.Count != 0 && ids.Count > 1)
                 jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids= " + responseString(ids) + " &fields=country,city,sex&lang=0"));
             else
                 if (ids.Count == 1)
                     jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids={0}&fields=country,city,sex&lang=0", ids.First()));
                 else return;
-            JToken jtoken2 = JToken.Parse(jfield2);
+            if (jfield2 != "")
+                jtoken2 = JToken.Parse(jfield2);
+            else
+            {
+                textBox1.AppendText("Error: " + "ошибка загрузки страницы" + Environment.NewLine);
+                return;
+            }
+
+            listInfoFriend.Clear();
 
             if ((countryTextBox.Text == "") && (cityTextBox.Text == "") && (sexComboBox.Text == ""))
                 listInfoFriend = jtoken2["response"].Children().
                 Select(c => c.ToObject<User>()).ToList();
-            else if ((countryTextBox.Text != "") && (cityTextBox.Text != "") && (sexComboBox.Text != ""))
-                listInfoFriend = jtoken2["response"].Children().
-                Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text && c.City == cityTextBox.Text && c.Sex == sexComboBox.Text).ToList();
-            else if ((countryTextBox.Text == "") && (sexComboBox.Text != ""))
-                listInfoFriend = jtoken2["response"].Children().
-                Select(c => c.ToObject<User>()).
-                Where(c => c.Sex == sexComboBox.Text).ToList();
-            else if ((countryTextBox.Text != "") && (cityTextBox.Text != "") && (sexComboBox.Text == ""))
-                listInfoFriend = jtoken2["response"].Children().
-                Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text).Where(c => c.City == cityTextBox.Text).ToList();
-            else if ((countryTextBox.Text != "") && (sexComboBox.Text != "") && (cityTextBox.Text == ""))
-                listInfoFriend = jtoken2["response"].Children().
-                Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text).
-                Where(c => c.Sex == sexComboBox.Text).ToList();
-            else if ((countryTextBox.Text == "") && (cityTextBox.Text != "") && (sexComboBox.Text != ""))
-                listInfoFriend = jtoken2["response"].Children().
-                Select(c => c.ToObject<User>()).Where(c => c.City == cityTextBox.Text).
-                Where(c => c.Sex == sexComboBox.Text).ToList();
+            else
+            {
+                if (countryTextBox.Text != "")
+                {
+                    listInfoFriend = jtoken2["response"].Children().
+                    Select(c => c.ToObject<User>()).
+                    Where(c => c.Country == countryTextBox.Text && countryTextBox.Text != "").ToList();
+                }
 
+                if (listInfoFriend.Count != 0 && cityTextBox.Text != "")
+                   listInfoFriend = listInfoFriend.Where(c => c.City == cityTextBox.Text && cityTextBox.Text != "").ToList();
+                else
+                    if (cityTextBox.Text != "")
+                        listInfoFriend = jtoken2["response"].Children().
+                    Select(c => c.ToObject<User>()).
+                    Where(c => c.City == cityTextBox.Text && cityTextBox.Text != "").ToList();
+
+
+                if (listInfoFriend.Count != 0 && sexComboBox.Text != "")
+                   listInfoFriend = listInfoFriend.Where(c => c.Sex == sexComboBox.Text && sexComboBox.Text != "").ToList();
+                else
+                    if (sexComboBox.Text != "")
+                        listInfoFriend = jtoken2["response"].Children().
+                    Select(c => c.ToObject<User>()).
+                    Where(c => c.Sex == sexComboBox.Text && sexComboBox.Text != "").ToList();
+
+            }
         }
+
+        public void filterSex(JToken jtoken2)
+        {
+            listInfoFriend = jtoken2["response"].Children().
+                    Select(c => c.ToObject<User>()).
+                    Where(c => c.Sex == sexComboBox.Text).ToList();
+        }
+        public void filterCity(JToken jtoken2) {
+            listInfoFriend = jtoken2["response"].Children().
+                       Select(c => c.ToObject<User>()).
+                       Where(c => c.City == cityTextBox.Text).ToList();
+        }
+        public void filterCountry(JToken jtoken2) { listInfoFriend = jtoken2["response"].Children().
+                Select(c => c.ToObject<User>()).
+                Where(c => c.Country == countryTextBox.Text).ToList();}
 
         public string responseString(List<string> ids)
         {
@@ -138,6 +170,7 @@ namespace Friends_DWint
                         if (fileInfo.Length > 0)
                             try
                             {
+                                textBox1.AppendText("Идет загрузка... " + Environment.NewLine);
                                 st = new StreamReader(file, System.Text.Encoding.Default);
                                 string line;
                                 int countLine = 0;
@@ -145,11 +178,12 @@ namespace Friends_DWint
                                 {
                                     while ((line = st.ReadLine()) != null)
                                     { countLine++; }
-                                    progressBar1.Maximum = countLine;
+                                    progressBar1.Maximum = countLine+1;
                                 }
                                 catch (Exception ex) { MessageBox.Show(ex.Message); }
                                 finally { st.Close(); }
                                 st = new StreamReader(file, System.Text.Encoding.Default);
+                                progressBar1.Value = 1;
                                 while ((line = st.ReadLine()) != null)
                                 {
                                     try
