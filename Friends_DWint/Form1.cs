@@ -92,8 +92,7 @@ namespace Friends_DWint
                 Select(c => c.ToObject<User>()).ToList();
             else if ((countryTextBox.Text != "") && (cityTextBox.Text != "") && (sexComboBox.Text != ""))
                 listInfoFriend = jtoken2["response"].Children().
-                Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text).Where(c => c.City == cityTextBox.Text).
-                Where(c => c.Sex == sexComboBox.Text).ToList();
+                Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text && c.City == cityTextBox.Text && c.Sex == sexComboBox.Text).ToList();
             else if ((countryTextBox.Text == "") && (sexComboBox.Text != ""))
                 listInfoFriend = jtoken2["response"].Children().
                 Select(c => c.ToObject<User>()).
@@ -105,7 +104,7 @@ namespace Friends_DWint
                 listInfoFriend = jtoken2["response"].Children().
                 Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text).
                 Where(c => c.Sex == sexComboBox.Text).ToList();
-            else if((countryTextBox.Text == "") && (cityTextBox.Text != "") && (sexComboBox.Text != ""))
+            else if ((countryTextBox.Text == "") && (cityTextBox.Text != "") && (sexComboBox.Text != ""))
                 listInfoFriend = jtoken2["response"].Children().
                 Select(c => c.ToObject<User>()).Where(c => c.City == cityTextBox.Text).
                 Where(c => c.Sex == sexComboBox.Text).ToList();
@@ -141,6 +140,16 @@ namespace Friends_DWint
                             {
                                 st = new StreamReader(file, System.Text.Encoding.Default);
                                 string line;
+                                int countLine = 0;
+                                try
+                                {
+                                    while ((line = st.ReadLine()) != null)
+                                    { countLine++; }
+                                    progressBar1.Maximum = countLine;
+                                }
+                                catch (Exception ex) { MessageBox.Show(ex.Message); }
+                                finally { st.Close(); }
+                                st = new StreamReader(file, System.Text.Encoding.Default);
                                 while ((line = st.ReadLine()) != null)
                                 {
                                     try
@@ -164,7 +173,7 @@ namespace Friends_DWint
                                         strwr.Close();
                                     }
                                     catch (Exception ex) { MessageBox.Show(ex.Message); }
-                                    finally { strwr.Close(); }
+                                    finally { strwr.Close(); progressBar1.Value += 1; }
 
                                 }
                                 st.Close();

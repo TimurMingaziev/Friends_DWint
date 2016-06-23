@@ -11,7 +11,7 @@ using System.Web;
 
 namespace Friends_DWint
 {
-    class ClassQueries
+    class ClassQueries 
     {
         public string loadPage(string url)
         {
