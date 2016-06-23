@@ -128,21 +128,6 @@ namespace Friends_DWint
             }
         }
 
-        public void filterSex(JToken jtoken2)
-        {
-            listInfoFriend = jtoken2["response"].Children().
-                    Select(c => c.ToObject<User>()).
-                    Where(c => c.Sex == sexComboBox.Text).ToList();
-        }
-        public void filterCity(JToken jtoken2) {
-            listInfoFriend = jtoken2["response"].Children().
-                       Select(c => c.ToObject<User>()).
-                       Where(c => c.City == cityTextBox.Text).ToList();
-        }
-        public void filterCountry(JToken jtoken2) { listInfoFriend = jtoken2["response"].Children().
-                Select(c => c.ToObject<User>()).
-                Where(c => c.Country == countryTextBox.Text).ToList();}
-
         public string responseString(List<string> ids)
         {
             
@@ -213,7 +198,7 @@ namespace Friends_DWint
                                 st.Close();
                             }
                             catch (Exception ex) { MessageBox.Show(ex.Message); }
-                            finally { st.Close(); }
+                            finally { st.Close(); progressBar1.Value = 0; textBox1.AppendText("Загрузка окончена" + Environment.NewLine); }
 
                 }
             }
