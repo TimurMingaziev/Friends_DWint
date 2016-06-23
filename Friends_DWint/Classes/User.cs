@@ -47,9 +47,10 @@ namespace Friends_DWint
                 List<Country> lcountry = jtoken["response"].Children().Select(c => c.ToObject<Country>()).ToList();
                 try
                 {
-                    country = lcountry.First().title;
+                    if (lcountry.Count!=0)
+                        country = lcountry.First().title;
                 }
-                catch (Exception) { }
+                catch{ }
             }
         }
 
@@ -67,9 +68,10 @@ namespace Friends_DWint
                 List<City> lcity = jtoken["response"].Children().Select(c => c.ToObject<City>()).ToList();         
                 try
                 {
-                    city = lcity.First().title;
+                    if (lcity.Count != 0)
+                        city = lcity.First().title;
                 }
-                catch(Exception){}
+                catch{ }
             }
         }
 

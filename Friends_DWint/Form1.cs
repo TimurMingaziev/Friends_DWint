@@ -9,13 +9,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
 using System.IO;
-using VkNet;
 
 namespace Friends_DWint
 {
     public partial class Form1 : Form
     {
-        List<int> listFriend = new List<int>();
+        List<string> listFriend = new List<string>();
         List<User> listInfoFriend = new List<User>();
 
         public Form1()
@@ -73,70 +72,55 @@ namespace Friends_DWint
             string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/friends.get?user_id={0}&order=random", id));
             JToken jtoken = JToken.Parse(jfield);
 
-            listFriend = jtoken["response"].Children().Select(c => c.ToObject<int>()).ToList();
+            listFriend = jtoken["response"].Children().Select(c => c.ToObject<string>()).ToList();
 
         }
 
-        public void checkFiltr(int id)
+        public void checkFiltr(List<string> ids)
         {
-            string jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_id={0}&fields=country,city,sex&lang=0", id));
+            string jfield2 = "";
+            if (ids.Count != 0 && ids.Count > 1)
+                jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids= " + responseString(ids) + " &fields=country,city,sex&lang=0"));
+            else
+                if (ids.Count == 1)
+                    jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids={0}&fields=country,city,sex&lang=0", ids.First()));
+                else return;
             JToken jtoken2 = JToken.Parse(jfield2);
-            List<User> listUser = jtoken2["response"].Children().
-                Select(c => c.ToObject<User>()).ToList();
-            try { 
-                listInfoFriend.Add(filter(listUser).First());
-            }
-            catch { }
-        }
-
-
-        public List<User> filter(List<User> listUser)
-        {
-            List<User> newUserListCountry = new List<User>();
-            List<User> newUserListSex = new List<User>();
-            List<User> newUserListCity = new List<User>();
-            List<User> filteredList = new List<User>();
 
             if ((countryTextBox.Text == "") && (cityTextBox.Text == "") && (sexComboBox.Text == ""))
-                return null;
-            if ((countryTextBox.Text != "") && (cityTextBox.Text != "") && (sexComboBox.Text != "")){
-                foreach (User user in listUser)
-                {
-                    if ((user.Country != null) && (user.Country == countryTextBox.Text) &&
-                             (user.City != null) && (user.City == cityTextBox.Text) &&
-                                 (user.Sex != null) && (user.Sex == sexComboBox.Text))
-                        filteredList.Add(user);
-                }
-                return filteredList;
-            }
-            if (sexComboBox.Text != "")
-            {
-                foreach (User user in listUser)
-                {
-                    if ((user.Sex != null) && (user.Sex == sexComboBox.Text))
-                        newUserListSex.Add(user);
-                }
-                filteredList = newUserListSex;
-            }
+                listInfoFriend = jtoken2["response"].Children().
+                Select(c => c.ToObject<User>()).ToList();
+            else if ((countryTextBox.Text != "") && (cityTextBox.Text != "") && (sexComboBox.Text != ""))
+                listInfoFriend = jtoken2["response"].Children().
+                Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text).Where(c => c.City == cityTextBox.Text).
+                Where(c => c.Sex == sexComboBox.Text).ToList();
+            else if ((countryTextBox.Text == "") && (sexComboBox.Text != ""))
+                listInfoFriend = jtoken2["response"].Children().
+                Select(c => c.ToObject<User>()).
+                Where(c => c.Sex == sexComboBox.Text).ToList();
+            else if ((countryTextBox.Text != "") && (cityTextBox.Text != "") && (sexComboBox.Text == ""))
+                listInfoFriend = jtoken2["response"].Children().
+                Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text).Where(c => c.City == cityTextBox.Text).ToList();
+            else if ((countryTextBox.Text != "") && (sexComboBox.Text != "") && (cityTextBox.Text == ""))
+                listInfoFriend = jtoken2["response"].Children().
+                Select(c => c.ToObject<User>()).Where(c => c.Country == countryTextBox.Text).
+                Where(c => c.Sex == sexComboBox.Text).ToList();
+            else if((countryTextBox.Text == "") && (cityTextBox.Text != "") && (sexComboBox.Text != ""))
+                listInfoFriend = jtoken2["response"].Children().
+                Select(c => c.ToObject<User>()).Where(c => c.City == cityTextBox.Text).
+                Where(c => c.Sex == sexComboBox.Text).ToList();
 
-            if (countryTextBox.Text != "")
+        }
+
+        public string responseString(List<string> ids)
+        {
+            
+            string uids = ids[0];
+            for (int i = 1; i < ids.Count; i++)
             {
-                foreach (User user in newUserListSex)
-                {
-                    if ((user.Country != null) && (user.Country == countryTextBox.Text))
-                        newUserListCountry.Add(user);
-                }
-                filteredList = newUserListCountry;
-                if(cityTextBox.Text!="")
-                    foreach (User user in newUserListCountry)
-                    {
-                        if ((user.City != null) && (user.City == cityTextBox.Text))
-                            newUserListCity.Add(user);
-                    }
-                filteredList = newUserListCity;
-                
+                uids += "," + ids.ElementAt(i);
             }
-            return filteredList;
+            return uids;
         }
 
 
@@ -147,7 +131,7 @@ namespace Friends_DWint
 
                 foreach (String file in openFileDialog1.FileNames)
                 {
-
+                    List<string> idsForFilter = new List<string>();//test
                     FileInfo fileInfo = new FileInfo(file);
                     StreamWriter strwr = null;
                     StreamReader st = null;
@@ -163,14 +147,17 @@ namespace Friends_DWint
                                     {
                                         if (getNameUser(line) == "")
                                             continue;
-                                        checkFiltr(48327052);
-                                        string fnameForWrite = saveTextBox.Text + "\\" + "friends " + getNameUser(line) + ".txt";
+                                        
+                                        string fnameForWrite = saveTextBox.Text + "\\" + "friends " + getNameUser(line) + "_" +countryTextBox.Text+"_"+cityTextBox.Text+"_"+sexComboBox.Text+".txt";
                                         strwr = new StreamWriter(fnameForWrite);
                                         getFriends(line);
-                                        if (listFriend.Count != 0)
-                                            foreach (int ids in listFriend)
-                                                //сюда user.get
-                                                strwr.WriteLine(ids);
+                                        if (listFriend.Count != 0){
+
+                                            checkFiltr(listFriend);//test
+                                            if (listInfoFriend.Count!=0)
+                                            foreach (User user in listInfoFriend)
+                                                strwr.WriteLine(user.uid);
+                                            }
 
                                         else
                                             textBox1.AppendText("Warning: " + line + " нет друзей (возможна ошибка)" + Environment.NewLine);
@@ -191,9 +178,15 @@ namespace Friends_DWint
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            
             //if (DateTime.Today > Convert.ToDateTime("19.06.2016 0:00:00"))
             //    Application.Exit();
             //else MessageBox.Show("Пробная версия до 18.06.2016 (включительно)");
+        }
+
+        private void countryTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
 
 
