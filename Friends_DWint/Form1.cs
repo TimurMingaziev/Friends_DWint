@@ -60,38 +60,59 @@ namespace Friends_DWint
                     name = user.first_name + " " + user.last_name;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                textBox1.AppendText("Error: " + id + Environment.NewLine);
+                textBox1.AppendText("Error by id: " + id + " ^" + ex.Message + "^ " + Environment.NewLine);
             }
             return name;
         }
 
         public void getFriends(string id)
         {
-            string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/friends.get?user_id={0}&order=random", id));
-            JToken jtoken = JToken.Parse(jfield);
+            try
+            {
+                string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/friends.get?user_id={0}&order=random", id));
+                JToken jtoken = JToken.Parse(jfield);
 
-            listFriend = jtoken["response"].Children().Select(c => c.ToObject<string>()).ToList();
-
+                listFriend = jtoken["response"].Children().Select(c => c.ToObject<string>()).ToList();
+            }
+            catch (Exception ex)
+            {
+                textBox1.AppendText("Error by id: " + id + " ^" + ex.Message + "^ " + Environment.NewLine);
+            }
+        
         }
+
 
         public void checkFiltr(List<string> ids)
         {
             string jfield2 = "";
             JToken jtoken2 = null;
-            if (ids.Count != 0 && ids.Count > 1)
-                jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids= " + responseString(ids) + " &fields=country,city,sex&lang=0"));
-            else
-                if (ids.Count == 1)
-                    jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids={0}&fields=country,city,sex&lang=0", ids.First()));
-                else return;
-            if (jfield2 != "")
-                jtoken2 = JToken.Parse(jfield2);
-            else
+            try
             {
-                textBox1.AppendText("Error: " + "ошибка загрузки страницы" + Environment.NewLine);
-                return;
+                if (ids.Count != 0 && ids.Count > 1)
+                    jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids= " + responseString(ids) + " &fields=country,city,sex&lang=0"));
+                else
+                    if (ids.Count == 1)
+                        jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids={0}&fields=country,city,sex&lang=0", ids.First()));
+                    else return;
+
+                if (jfield2 != "")
+                    try
+                    {
+                        jtoken2 = JToken.Parse(jfield2);
+                    }
+                    catch (Exception ex) { textBox1.AppendText("Error: " + "ошибка загрузки страницы " + " ^" + ex.Message + "^ " + Environment.NewLine); }
+
+                else
+                {
+                    textBox1.AppendText("Error: " + "ошибка загрузки страницы" + Environment.NewLine);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                textBox1.AppendText("Error :"+ " ^" + ex.Message + "^ " + Environment.NewLine);
             }
 
             listInfoFriend.Clear();
@@ -139,9 +160,11 @@ namespace Friends_DWint
             return uids;
         }
 
+     
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (DateTime.Today <= Convert.ToDateTime("28.06.2016 0:00:00"))
             if (listFilesListBox.Items.Count != 0 && saveTextBox.Text != "")
             {
 
@@ -168,15 +191,17 @@ namespace Friends_DWint
                                 catch (Exception ex) { MessageBox.Show(ex.Message); }
                                 finally { st.Close(); }
                                 st = new StreamReader(file, System.Text.Encoding.Default);
-                                progressBar1.Value = 1;
+                                progressBar1.Value += 1;
+                                int countFile=0;
                                 while ((line = st.ReadLine()) != null)
                                 {
+                                    countFile++;
                                     try
                                     {
                                         if (getNameUser(line) == "")
                                             continue;
                                         
-                                        string fnameForWrite = saveTextBox.Text + "\\" + "friends " + getNameUser(line) + "_" +countryTextBox.Text+"_"+cityTextBox.Text+"_"+sexComboBox.Text+".txt";
+                                        string fnameForWrite = saveTextBox.Text + "\\" + countFile+ "_friends " + getNameUser(line) + "_" +countryTextBox.Text+"_"+cityTextBox.Text+"_"+sexComboBox.Text+".txt";
                                         strwr = new StreamWriter(fnameForWrite);
                                         getFriends(line);
                                         if (listFriend.Count != 0){
@@ -191,25 +216,27 @@ namespace Friends_DWint
                                             textBox1.AppendText("Warning: " + line + " нет друзей (возможна ошибка)" + Environment.NewLine);
                                         strwr.Close();
                                     }
-                                    catch (Exception ex) { MessageBox.Show(ex.Message); }
+                                    catch (Exception ex) { textBox1.AppendText("Error by id: " + line + " ^" + ex.Message + "^ " + Environment.NewLine); }
                                     finally { strwr.Close(); progressBar1.Value += 1; }
 
                                 }
                                 st.Close();
                             }
-                            catch (Exception ex) { MessageBox.Show(ex.Message); }
+                            catch (Exception ex) { textBox1.AppendText("Error :" + " ^" + ex.Message + "^ " + Environment.NewLine); }
                             finally { st.Close(); progressBar1.Value = 0; textBox1.AppendText("Загрузка окончена" + Environment.NewLine); }
 
                 }
             }
+            else MessageBox.Show("Пробная версия закончилась");
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             
-            //if (DateTime.Today > Convert.ToDateTime("19.06.2016 0:00:00"))
-            //    Application.Exit();
-            //else MessageBox.Show("Пробная версия до 18.06.2016 (включительно)");
+            if (DateTime.Today > Convert.ToDateTime("28.06.2016 0:00:00"))
+                Application.Exit();
+            else MessageBox.Show("Пробная версия до 28.06.2016 (включительно)");
         }
 
         private void countryTextBox_TextChanged(object sender, EventArgs e)

@@ -9,6 +9,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Web;
 
+
 namespace Friends_DWint
 {
     class ClassQueries 
@@ -29,13 +30,13 @@ namespace Friends_DWint
                     htmlCode = reader.ReadToEnd();
                     htmlCode = HttpUtility.HtmlDecode(htmlCode);
                 }
-                catch (WebException ex) { MessageBox.Show(ex.Message); }
-                catch (ProtocolViolationException ex) { MessageBox.Show(ex.Message); }
-                catch (UriFormatException ex) { MessageBox.Show(ex.Message); }
-                catch (IOException ex) { MessageBox.Show(ex.Message); }
-                catch (NotSupportedException ex) { MessageBox.Show(ex.Message); }
+                //catch (WebException ex) { MessageBox.Show(ex.Message); }
+                //catch (ProtocolViolationException ex) { MessageBox.Show(ex.Message); }
+                //catch (UriFormatException ex) { MessageBox.Show(ex.Message); }
+                //catch (IOException ex) { MessageBox.Show(ex.Message); }
+                //catch (NotSupportedException ex) { MessageBox.Show(ex.Message); }
                 catch (System.Security.SecurityException ex) { MessageBox.Show(ex.Message); }
-
+                catch { }
                 finally
                 {
                     if (resp != null)
@@ -45,7 +46,8 @@ namespace Friends_DWint
 
                 }
             }
-            catch (Exception e) { MessageBox.Show(e.Message); }
+          //  catch (Exception e) { MessageBox.Show(e.Message); }
+            catch {}
             return htmlCode;
         }
 
