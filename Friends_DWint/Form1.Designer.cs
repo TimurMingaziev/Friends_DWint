@@ -40,8 +40,6 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.sexComboBox = new System.Windows.Forms.ComboBox();
-            this.cityTextBox = new System.Windows.Forms.TextBox();
-            this.countryTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -134,21 +132,6 @@
             this.sexComboBox.Size = new System.Drawing.Size(191, 21);
             this.sexComboBox.TabIndex = 11;
             // 
-            // cityTextBox
-            // 
-            this.cityTextBox.Location = new System.Drawing.Point(326, 140);
-            this.cityTextBox.Name = "cityTextBox";
-            this.cityTextBox.Size = new System.Drawing.Size(65, 20);
-            this.cityTextBox.TabIndex = 12;
-            // 
-            // countryTextBox
-            // 
-            this.countryTextBox.Location = new System.Drawing.Point(337, 110);
-            this.countryTextBox.Name = "countryTextBox";
-            this.countryTextBox.Size = new System.Drawing.Size(54, 20);
-            this.countryTextBox.TabIndex = 13;
-//            this.countryTextBox.TextChanged += new System.EventHandler(this.countryTextBox_TextChanged);
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -201,6 +184,7 @@
             this.cityComboBox.Name = "cityComboBox";
             this.cityComboBox.Size = new System.Drawing.Size(190, 21);
             this.cityComboBox.TabIndex = 19;
+            this.cityComboBox.Leave += new System.EventHandler(this.cityComboBox_Leave);
             // 
             // Form1
             // 
@@ -213,8 +197,6 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.countryTextBox);
-            this.Controls.Add(this.cityTextBox);
             this.Controls.Add(this.sexComboBox);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.listFilesListBox);
@@ -248,8 +230,6 @@
         public System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.ComboBox sexComboBox;
-        private System.Windows.Forms.TextBox cityTextBox;
-        private System.Windows.Forms.TextBox countryTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;

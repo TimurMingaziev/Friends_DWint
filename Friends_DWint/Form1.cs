@@ -18,6 +18,9 @@ namespace Friends_DWint
         List<string> listFriend = new List<string>();
         List<User> listInfoFriend = new List<User>();
         List<Country> listCoutries;
+        List<City> listCities;
+        int idCountry = 0;
+        int idCity = 0;
 
         public Form1()
         {
@@ -120,25 +123,25 @@ namespace Friends_DWint
 
             listInfoFriend.Clear();
 
-            if ((countryTextBox.Text == "") && (cityTextBox.Text == "") && (sexComboBox.Text == ""))
+            if ((countryComboBox.Text == "") && (cityComboBox.Text == "") && (sexComboBox.Text == ""))
                 listInfoFriend = jtoken2["response"].Children().
                 Select(c => c.ToObject<User>()).ToList();
             else
             {
-                if (countryTextBox.Text != "")
+                if (countryComboBox.Text != "")
                 {
                     listInfoFriend = jtoken2["response"].Children().
                     Select(c => c.ToObject<User>()).
-                    Where(c => c.Country == countryTextBox.Text && countryTextBox.Text != "").ToList();
+                    Where(c => c.country == idCountry && countryComboBox.Text != "").ToList();
                 }
 
-                if (listInfoFriend.Count != 0 && cityTextBox.Text != "")
-                   listInfoFriend = listInfoFriend.Where(c => c.City == cityTextBox.Text && cityTextBox.Text != "").ToList();
+                if (listInfoFriend.Count != 0 && cityComboBox.Text != "")
+                    listInfoFriend = listInfoFriend.Where(c => c.city == idCity && cityComboBox.Text != "").ToList();
                 else
-                    if (cityTextBox.Text != "")
+                    if (cityComboBox.Text != "")
                         listInfoFriend = jtoken2["response"].Children().
                     Select(c => c.ToObject<User>()).
-                    Where(c => c.City == cityTextBox.Text && cityTextBox.Text != "").ToList();
+                    Where(c => c.city == idCity && cityComboBox.Text != "").ToList();
 
 
                 if (listInfoFriend.Count != 0 && sexComboBox.Text != "")
@@ -165,7 +168,18 @@ namespace Friends_DWint
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (DateTime.Today <= Convert.ToDateTime("28.06.2016 0:00:00"))
+
+            if (idCountry == 0 && countryComboBox.Text != "")
+            {
+                MessageBox.Show("Страна введена не верно");
+                return;
+            }
+
+            if (idCity == 0 && cityComboBox.Text != "")
+            {
+                MessageBox.Show("Город введен не верно");
+                return;
+            }
             if (listFilesListBox.Items.Count != 0 && saveTextBox.Text != "")
             {
 
@@ -188,13 +202,13 @@ namespace Friends_DWint
                                     while ((line = st.ReadLine()) != null)
                                     { countLine++; }
 
-                                    progressBar1.Maximum = countLine+1;
+                                    progressBar1.Maximum = countLine + 1;
                                 }
                                 catch (Exception ex) { MessageBox.Show(ex.Message); }
                                 finally { st.Close(); }
                                 st = new StreamReader(file, System.Text.Encoding.Default);
                                 progressBar1.Value += 1;
-                                int countFile=0;
+                                int countFile = 0;
                                 while ((line = st.ReadLine()) != null)
                                 {
                                     countFile++;
@@ -202,8 +216,8 @@ namespace Friends_DWint
                                     {
                                         if (getNameUser(line) == "")
                                             continue;
-                                        
-                                        string fnameForWrite = saveTextBox.Text + "\\" + countFile+ "_friends " + getNameUser(line) + "_" +countryTextBox.Text+"_"+cityTextBox.Text+"_"+sexComboBox.Text+".txt";
+
+                                        string fnameForWrite = saveTextBox.Text + "\\" + countFile + "_friends " + getNameUser(line) + "_" + countryComboBox.Text + "_" + cityComboBox.Text + "_" + sexComboBox.Text + ".txt";
                                         strwr = new StreamWriter(fnameForWrite);
                                         getFriends(line);
                                         if (listFriend.Count != 0)
@@ -211,20 +225,25 @@ namespace Friends_DWint
                                             textBox1.AppendText("INFO :" + "Друзей у " + line + " " + listFriend.Count + Environment.NewLine);
                                             int countSplit = 0;
                                             if (listFriend.Count > 700)
-                                               countSplit = countResponse(listFriend.Count);
+                                                countSplit = countResponse(listFriend.Count);
 
                                             if (countSplit > 1)
                                             {
                                                 IEnumerable<IEnumerable<string>> lists = new List<List<string>>();
                                                 lists = LinqExtensions.Split<string>(listFriend, countSplit);
-
+                                                int count123 = 0;//test
                                                 foreach (IEnumerable<string> list in lists)
                                                 {
-                                                    
+
                                                     checkFiltr(list.ToList());//test
                                                     if (listInfoFriend.Count != 0)
+                                                        
                                                         foreach (User user in listInfoFriend)
-                                                            strwr.WriteLine(user.uid);
+                                                        {
+                                                            count123++;//test
+                                                            strwr.WriteLine(count123+ " " +user.uid);
+
+                                                        }
                                                 }
                                             }
                                             else
@@ -238,18 +257,6 @@ namespace Friends_DWint
                                         else
                                             textBox1.AppendText("Warning: " + line + " нет друзей (возможна ошибка)" + Environment.NewLine);
                                         strwr.Close();
-
-                                        //if (listFriend.Count != 0){
-                                        //    textBox1.AppendText("INFO :" + "Друзей у " + line + " " + listFriend.Count + Environment.NewLine);
-                                        //    checkFiltr(listFriend);//test
-                                        //    if (listInfoFriend.Count!=0)
-                                        //    foreach (User user in listInfoFriend)
-                                        //        strwr.WriteLine(user.uid);
-                                        //    }
-
-                                        //else
-                                        //    textBox1.AppendText("Warning: " + line + " нет друзей (возможна ошибка)" + Environment.NewLine);
-                                        //strwr.Close();
                                     }
                                     catch (Exception ex) { textBox1.AppendText("Error by id: " + line + " ^" + ex.Message + "^ " + Environment.NewLine); }
                                     finally { strwr.Close(); progressBar1.Value += 1; }
@@ -262,8 +269,6 @@ namespace Friends_DWint
 
                 }
             }
-            else MessageBox.Show("Пробная версия закончилась");
-
         }
 
         public int countResponse(int count)
@@ -304,9 +309,9 @@ namespace Friends_DWint
 
         private void countryComboBox_Leave(object sender, EventArgs e)
         {
+            idCountry = 0;
             cityComboBox.Items.Clear();
             string selectedCountry = countryComboBox.Text;
-            int idCountry = 0;
             if (listCoutries.Count != 0)
             {
                 foreach (Country country in listCoutries)
@@ -317,24 +322,38 @@ namespace Friends_DWint
                         break;
                     }
                 }
-                try
-                {
-                    string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/database.getCities?country_id={0}&need_all=0&count=1000&lang=0&v=5.52", idCountry));
-                    JToken jtoken = JToken.Parse(jfield);
-
-                    List<City> listCities = jtoken["response"]["items"].Children().Select(c => c.ToObject<City>()).ToList();
-                    foreach (City city in listCities)
+                if (idCountry != 0)
+                    try
                     {
-                        cityComboBox.Items.Add(city.title);
+                        string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/database.getCities?country_id={0}&need_all=0&count=1000&lang=0&v=5.52", idCountry));
+                        JToken jtoken = JToken.Parse(jfield);
+
+                        listCities = jtoken["response"]["items"].Children().Select(c => c.ToObject<City>()).ToList();
+                        foreach (City city in listCities)
+                        {
+                            cityComboBox.Items.Add(city.title);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
 
             }
             else return;
+        }
+
+        private void cityComboBox_Leave(object sender, EventArgs e)
+        {
+            idCity = 0;
+            cityComboBox.Items.Clear();
+            string selectedCity = cityComboBox.Text;
+            foreach (City city in listCities)
+            {
+                if (selectedCity == city.title)
+                    idCity = city.id;
+            }
+            
         }
 
 
