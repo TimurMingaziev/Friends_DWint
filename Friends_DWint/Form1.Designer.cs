@@ -47,6 +47,7 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.countryComboBox = new System.Windows.Forms.ComboBox();
             this.cityComboBox = new System.Windows.Forms.ComboBox();
+            this.clearButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.SuspendLayout();
@@ -56,8 +57,8 @@
             this.button1.Location = new System.Drawing.Point(259, 164);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(132, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Выгружай меня нежно";
+            this.button1.TabIndex = 6;
+            this.button1.Text = "ВысАсать!";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -72,7 +73,7 @@
             this.loadButton.Name = "loadButton";
             this.loadButton.Size = new System.Drawing.Size(132, 23);
             this.loadButton.TabIndex = 1;
-            this.loadButton.Text = "Загрузить";
+            this.loadButton.Text = "Откуда высасать";
             this.loadButton.UseVisualStyleBackColor = true;
             this.loadButton.Click += new System.EventHandler(this.loadButton_Click);
             // 
@@ -82,7 +83,7 @@
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(132, 23);
             this.saveButton.TabIndex = 2;
-            this.saveButton.Text = "Сохранить";
+            this.saveButton.Text = "Куда высасать";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
@@ -92,7 +93,7 @@
             this.saveTextBox.Name = "saveTextBox";
             this.saveTextBox.ReadOnly = true;
             this.saveTextBox.Size = new System.Drawing.Size(240, 20);
-            this.saveTextBox.TabIndex = 4;
+            this.saveTextBox.TabIndex = 2;
             // 
             // listFilesListBox
             // 
@@ -101,7 +102,7 @@
             this.listFilesListBox.Location = new System.Drawing.Point(12, 12);
             this.listFilesListBox.Name = "listFilesListBox";
             this.listFilesListBox.Size = new System.Drawing.Size(240, 69);
-            this.listFilesListBox.TabIndex = 7;
+            this.listFilesListBox.TabIndex = 10;
             // 
             // textBox1
             // 
@@ -123,14 +124,16 @@
             // 
             // sexComboBox
             // 
+            this.sexComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.sexComboBox.FormattingEnabled = true;
             this.sexComboBox.Items.AddRange(new object[] {
+            "",
             "мужской",
             "женский"});
             this.sexComboBox.Location = new System.Drawing.Point(61, 166);
             this.sexComboBox.Name = "sexComboBox";
             this.sexComboBox.Size = new System.Drawing.Size(191, 21);
-            this.sexComboBox.TabIndex = 11;
+            this.sexComboBox.TabIndex = 5;
             // 
             // label1
             // 
@@ -170,27 +173,42 @@
             // 
             // countryComboBox
             // 
+            this.countryComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.countryComboBox.FormattingEnabled = true;
+            this.countryComboBox.Items.AddRange(new object[] {
+            ""});
             this.countryComboBox.Location = new System.Drawing.Point(61, 113);
             this.countryComboBox.Name = "countryComboBox";
             this.countryComboBox.Size = new System.Drawing.Size(191, 21);
-            this.countryComboBox.TabIndex = 18;
+            this.countryComboBox.TabIndex = 3;
             this.countryComboBox.Leave += new System.EventHandler(this.countryComboBox_Leave);
             // 
             // cityComboBox
             // 
+            this.cityComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cityComboBox.FormattingEnabled = true;
             this.cityComboBox.Location = new System.Drawing.Point(61, 139);
             this.cityComboBox.Name = "cityComboBox";
             this.cityComboBox.Size = new System.Drawing.Size(190, 21);
-            this.cityComboBox.TabIndex = 19;
+            this.cityComboBox.TabIndex = 4;
             this.cityComboBox.Leave += new System.EventHandler(this.cityComboBox_Leave);
+            // 
+            // clearButton
+            // 
+            this.clearButton.Location = new System.Drawing.Point(259, 138);
+            this.clearButton.Name = "clearButton";
+            this.clearButton.Size = new System.Drawing.Size(131, 23);
+            this.clearButton.TabIndex = 7;
+            this.clearButton.Text = "Отменить фильтры";
+            this.clearButton.UseVisualStyleBackColor = true;
+            this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(403, 300);
+            this.Controls.Add(this.clearButton);
             this.Controls.Add(this.cityComboBox);
             this.Controls.Add(this.countryComboBox);
             this.Controls.Add(this.progressBar1);
@@ -237,6 +255,7 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.ComboBox countryComboBox;
         private System.Windows.Forms.ComboBox cityComboBox;
+        private System.Windows.Forms.Button clearButton;
     }
 }
 

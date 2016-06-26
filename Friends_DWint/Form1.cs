@@ -27,39 +27,16 @@ namespace Friends_DWint
             InitializeComponent();
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
-        {
-            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
-            {
-                saveTextBox.Text = folderBrowserDialog1.SelectedPath;
-            }
-        }
-
-        private void loadButton_Click(object sender, EventArgs e)
-        {
-            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                listFilesListBox.Items.Clear();
-                foreach (String file in openFileDialog1.FileNames)
-                {
-
-                    listFilesListBox.Items.Add(file);
-
-                }
-            }
-
-        }
-
+        // Имя для создания файла
         public string getNameUser(string id)
         {
-            List<User> listUser = new List<User>();
             string name = "";
             try
             {
 
                 string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids={0}", id));
                 JToken jtoken = JToken.Parse(jfield);
-                listUser = jtoken["response"].Children().Select(c => c.ToObject<User>()).ToList();
+                List<User> listUser = jtoken["response"].Children().Select(c => c.ToObject<User>()).ToList();
                 foreach (User user in listUser)
                 {
                     name = user.first_name + " " + user.last_name;
@@ -72,6 +49,7 @@ namespace Friends_DWint
             return name;
         }
 
+        // Весь список друзей, который сохраняется в listFriend
         public void getFriends(string id)
         {
             try
@@ -85,10 +63,9 @@ namespace Friends_DWint
             {
                 textBox1.AppendText("Error by id: " + id + " ^" + ex.Message + "^ " + Environment.NewLine);
             }
-        
         }
 
-
+        // Загрузка информации о друзьях и фильтрация
         public void checkFiltr(List<string> ids)
         {
             string jfield2 = "";
@@ -97,7 +74,6 @@ namespace Friends_DWint
             {
                 if (ids.Count != 0 && ids.Count > 1)
                     jfield2 = new ClassQueries().loadPagePOST("https://api.vk.com/method/users.get", "user_ids="+ responseString(ids) +"&fields=country,city,sex&lang=0", ids.Count);
-                // jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids= " + responseString(ids) + " &fields=country,city,sex&lang=0"));
                 else
                     if (ids.Count == 1)
                         jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids={0}&fields=country,city,sex&lang=0", ids.First()));
@@ -155,6 +131,7 @@ namespace Friends_DWint
             }
         }
 
+        // Конвертация списка ids в строку
         public string responseString(List<string> ids)
         {
             
@@ -166,26 +143,64 @@ namespace Friends_DWint
             return uids;
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
+        // Проверка на не заполненные поля перед стартом
+        public bool checkStart() {
             if (idCountry == 0 && countryComboBox.Text != "")
             {
                 MessageBox.Show("Страна введена не верно");
-                return;
+                return false;
             }
 
             if (idCity == 0 && cityComboBox.Text != "")
             {
                 MessageBox.Show("Город введен не верно");
-                return;
+                return false;
             }
-            if (listFilesListBox.Items.Count != 0 && saveTextBox.Text != "")
+            if (listFilesListBox.Items.Count == 0 && saveTextBox.Text == "")
             {
+                MessageBox.Show("Выберите место сохранения/загрузки файла");
+                return false;
+            }
+            return true;
+        }
 
+        // Установка progressBar-у максимальное значение
+        public void progressBarStartPosition(String file)
+        {
+            textBox1.AppendText("Идет загрузка... " + Environment.NewLine);
+            StreamReader st = new StreamReader(file, System.Text.Encoding.Default);
+            string line;
+            int countLine = 0;
+            try
+            {
+                while ((line = st.ReadLine()) != null)
+                { countLine++; }
+
+                progressBar1.Maximum = countLine+1;
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            finally { st.Close(); }
+        }
+
+        // На сколько нужно делить запрос
+        public int countResponse(int count)
+        {
+            int k = 0;
+            while (count >= 700)
+            {
+                if (count % 700 == 0)
+                    k++;
+                count--;
+            }
+            return k + 1;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (checkStart())
                 foreach (String file in openFileDialog1.FileNames)
                 {
-                    List<string> idsForFilter = new List<string>();//test
+                    List<string> idsForFilter = new List<string>(); //test
                     FileInfo fileInfo = new FileInfo(file);
                     StreamWriter strwr = null;
                     StreamReader st = null;
@@ -193,19 +208,8 @@ namespace Friends_DWint
                         if (fileInfo.Length > 0)
                             try
                             {
-                                textBox1.AppendText("Идет загрузка... " + Environment.NewLine);
-                                st = new StreamReader(file, System.Text.Encoding.Default);
+                                progressBarStartPosition(file);
                                 string line;
-                                int countLine = 0;
-                                try
-                                {
-                                    while ((line = st.ReadLine()) != null)
-                                    { countLine++; }
-
-                                    progressBar1.Maximum = countLine + 1;
-                                }
-                                catch (Exception ex) { MessageBox.Show(ex.Message); }
-                                finally { st.Close(); }
                                 st = new StreamReader(file, System.Text.Encoding.Default);
                                 progressBar1.Value += 1;
                                 int countFile = 0;
@@ -229,21 +233,13 @@ namespace Friends_DWint
 
                                             if (countSplit > 1)
                                             {
-                                                IEnumerable<IEnumerable<string>> lists = new List<List<string>>();
-                                                lists = LinqExtensions.Split<string>(listFriend, countSplit);
-                                                int count123 = 0;//test
+                                                IEnumerable<IEnumerable<string>> lists = LinqExtensions.Split<string>(listFriend, countSplit);
                                                 foreach (IEnumerable<string> list in lists)
                                                 {
-
-                                                    checkFiltr(list.ToList());//test
+                                                    checkFiltr(list.ToList());
                                                     if (listInfoFriend.Count != 0)
-                                                        
                                                         foreach (User user in listInfoFriend)
-                                                        {
-                                                            count123++;//test
-                                                            strwr.WriteLine(count123+ " " +user.uid);
-
-                                                        }
+                                                            strwr.WriteLine(+ user.uid);
                                                 }
                                             }
                                             else
@@ -266,25 +262,9 @@ namespace Friends_DWint
                             }
                             catch (Exception ex) { textBox1.AppendText("Error :" + " ^" + ex.Message + "^ " + Environment.NewLine); }
                             finally { st.Close(); progressBar1.Value = 0; textBox1.AppendText("Загрузка окончена" + Environment.NewLine); }
-
                 }
-            }
         }
 
-        public int countResponse(int count)
-        {
-            int k=0;
-            while (count >= 700)
-            {
-                if (count % 700 == 0)
-                    k++;
-                count--;
-            }
-            return k+1;
-        }
-
-
-        
         private void Form1_Load(object sender, EventArgs e)
         {
             
@@ -302,10 +282,9 @@ namespace Friends_DWint
                     countryComboBox.Items.Add(country.title);
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex) {MessageBox.Show(ex.Message);}
             
         }
-
 
         private void countryComboBox_Leave(object sender, EventArgs e)
         {
@@ -334,10 +313,7 @@ namespace Friends_DWint
                             cityComboBox.Items.Add(city.title);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
+                    catch (Exception ex) {MessageBox.Show(ex.Message);}
 
             }
             else return;
@@ -346,14 +322,34 @@ namespace Friends_DWint
         private void cityComboBox_Leave(object sender, EventArgs e)
         {
             idCity = 0;
-            cityComboBox.Items.Clear();
             string selectedCity = cityComboBox.Text;
             foreach (City city in listCities)
-            {
                 if (selectedCity == city.title)
-                    idCity = city.id;
+                    idCity = city.id;            
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+                saveTextBox.Text = folderBrowserDialog1.SelectedPath;
+        }
+
+        private void loadButton_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                listFilesListBox.Items.Clear();
+                foreach (String file in openFileDialog1.FileNames)
+                    listFilesListBox.Items.Add(file);
             }
-            
+
+        }
+
+        private void clearButton_Click(object sender, EventArgs e)
+        {
+            countryComboBox.SelectedIndex = -1;
+            cityComboBox.Items.Clear();
+            sexComboBox.SelectedIndex = -1;
         }
 
 
