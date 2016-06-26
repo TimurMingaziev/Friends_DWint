@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
 using System.IO;
 
+
 namespace Friends_DWint
 {
     public partial class Form1 : Form
@@ -91,7 +92,8 @@ namespace Friends_DWint
             try
             {
                 if (ids.Count != 0 && ids.Count > 1)
-                    jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids= " + responseString(ids) + " &fields=country,city,sex&lang=0"));
+                    jfield2 = new ClassQueries().loadPagePOST("https://api.vk.com/method/users.get", "user_ids="+ responseString(ids) +"&fields=country,city,sex&lang=0", ids.Count);
+                // jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids= " + responseString(ids) + " &fields=country,city,sex&lang=0"));
                 else
                     if (ids.Count == 1)
                         jfield2 = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/users.get?user_ids={0}&fields=country,city,sex&lang=0", ids.First()));
@@ -160,8 +162,6 @@ namespace Friends_DWint
             return uids;
         }
 
-     
-
         private void button1_Click(object sender, EventArgs e)
         {
             if (DateTime.Today <= Convert.ToDateTime("28.06.2016 0:00:00"))
@@ -186,6 +186,7 @@ namespace Friends_DWint
                                 {
                                     while ((line = st.ReadLine()) != null)
                                     { countLine++; }
+
                                     progressBar1.Maximum = countLine+1;
                                 }
                                 catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -204,17 +205,50 @@ namespace Friends_DWint
                                         string fnameForWrite = saveTextBox.Text + "\\" + countFile+ "_friends " + getNameUser(line) + "_" +countryTextBox.Text+"_"+cityTextBox.Text+"_"+sexComboBox.Text+".txt";
                                         strwr = new StreamWriter(fnameForWrite);
                                         getFriends(line);
-                                        if (listFriend.Count != 0){
+                                        if (listFriend.Count != 0)
+                                        {
+                                            textBox1.AppendText("INFO :" + "Друзей у " + line + " " + listFriend.Count + Environment.NewLine);
+                                            int countSplit = 0;
+                                            if (listFriend.Count > 700)
+                                               countSplit = countResponse(listFriend.Count);
 
-                                            checkFiltr(listFriend);//test
-                                            if (listInfoFriend.Count!=0)
-                                            foreach (User user in listInfoFriend)
-                                                strwr.WriteLine(user.uid);
+                                            if (countSplit > 1)
+                                            {
+                                                IEnumerable<IEnumerable<string>> lists = new List<List<string>>();
+                                                lists = LinqExtensions.Split<string>(listFriend, countSplit);
+
+                                                foreach (IEnumerable<string> list in lists)
+                                                {
+                                                    
+                                                    checkFiltr(list.ToList());//test
+                                                    if (listInfoFriend.Count != 0)
+                                                        foreach (User user in listInfoFriend)
+                                                            strwr.WriteLine(user.uid);
+                                                }
                                             }
-
+                                            else
+                                            {
+                                                checkFiltr(listFriend);//test
+                                                if (listInfoFriend.Count != 0)
+                                                    foreach (User user in listInfoFriend)
+                                                        strwr.WriteLine(user.uid);
+                                            }
+                                        }
                                         else
                                             textBox1.AppendText("Warning: " + line + " нет друзей (возможна ошибка)" + Environment.NewLine);
                                         strwr.Close();
+
+                                        //if (listFriend.Count != 0){
+                                        //    textBox1.AppendText("INFO :" + "Друзей у " + line + " " + listFriend.Count + Environment.NewLine);
+                                        //    checkFiltr(listFriend);//test
+                                        //    if (listInfoFriend.Count!=0)
+                                        //    foreach (User user in listInfoFriend)
+                                        //        strwr.WriteLine(user.uid);
+                                        //    }
+
+                                        //else
+                                        //    textBox1.AppendText("Warning: " + line + " нет друзей (возможна ошибка)" + Environment.NewLine);
+                                        //strwr.Close();
                                     }
                                     catch (Exception ex) { textBox1.AppendText("Error by id: " + line + " ^" + ex.Message + "^ " + Environment.NewLine); }
                                     finally { strwr.Close(); progressBar1.Value += 1; }
@@ -229,6 +263,18 @@ namespace Friends_DWint
             }
             else MessageBox.Show("Пробная версия закончилась");
 
+        }
+
+        public int countResponse(int count)
+        {
+            int k=0;
+            while (count >= 700)
+            {
+                if (count % 700 == 0)
+                    k++;
+                count--;
+            }
+            return k+1;
         }
 
         private void Form1_Load(object sender, EventArgs e)

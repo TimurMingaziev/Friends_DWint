@@ -14,6 +14,31 @@ namespace Friends_DWint
 {
     class ClassQueries 
     {
+        public string loadPagePOST(string url, string _data, int count) {
+            string htmlCode = "";
+             try
+             {
+                 var request = (HttpWebRequest)WebRequest.Create(url);
+                 var data = Encoding.ASCII.GetBytes(_data);
+                 request.Timeout = 10000;
+                 request.Method = "POST";
+                 request.ContentType = "application/x-www-form-urlencoded";
+                 request.ContentLength = data.Length;
+
+                 using (var stream = request.GetRequestStream())
+                 {
+                     stream.Write(data, 0, data.Length);
+                 }
+
+                 var response = (HttpWebResponse)request.GetResponse();
+
+                 var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                 htmlCode = HttpUtility.HtmlDecode(responseString);
+             }catch (System.Security.SecurityException ex) { MessageBox.Show(ex.Message); }
+                catch { }
+            return htmlCode;
+        }
+
         public string loadPage(string url)
         {
 
@@ -25,7 +50,8 @@ namespace Friends_DWint
                 Uri uri = new Uri(url);
                 try
                 {
-                    resp = WebRequest.Create(url).GetResponse();
+                    HttpWebRequest wr = (HttpWebRequest)WebRequest.Create(url);
+                    resp = wr.GetResponse();
                     reader = new StreamReader(resp.GetResponseStream());
                     htmlCode = reader.ReadToEnd();
                     htmlCode = HttpUtility.HtmlDecode(htmlCode);
