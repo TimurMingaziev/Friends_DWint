@@ -17,6 +17,7 @@ namespace Friends_DWint
     {
         List<string> listFriend = new List<string>();
         List<User> listInfoFriend = new List<User>();
+        List<Country> listCoutries;
 
         public Form1()
         {
@@ -277,17 +278,63 @@ namespace Friends_DWint
             return k+1;
         }
 
+
+        
         private void Form1_Load(object sender, EventArgs e)
         {
             
             if (DateTime.Today > Convert.ToDateTime("28.06.2016 0:00:00"))
                 Application.Exit();
             else MessageBox.Show("Пробная версия до 28.06.2016 (включительно)");
+            try
+            {
+                string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/database.getCountries?need_all=1&count=1000&lang=0&v=5.52"));
+                JToken jtoken = JToken.Parse(jfield);
+
+                listCoutries = jtoken["response"]["items"].Children().Select(c => c.ToObject<Country>()).ToList();
+                foreach (Country country in listCoutries)
+                {
+                    countryComboBox.Items.Add(country.title);
+                }
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            
         }
 
-        private void countryTextBox_TextChanged(object sender, EventArgs e)
-        {
 
+        private void countryComboBox_Leave(object sender, EventArgs e)
+        {
+            cityComboBox.Items.Clear();
+            string selectedCountry = countryComboBox.Text;
+            int idCountry = 0;
+            if (listCoutries.Count != 0)
+            {
+                foreach (Country country in listCoutries)
+                {
+                    if (selectedCountry == country.title)
+                    {
+                        idCountry = country.id;
+                        break;
+                    }
+                }
+                try
+                {
+                    string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/database.getCities?country_id={0}&need_all=0&count=1000&lang=0&v=5.52", idCountry));
+                    JToken jtoken = JToken.Parse(jfield);
+
+                    List<City> listCities = jtoken["response"]["items"].Children().Select(c => c.ToObject<City>()).ToList();
+                    foreach (City city in listCities)
+                    {
+                        cityComboBox.Items.Add(city.title);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+            }
+            else return;
         }
 
 

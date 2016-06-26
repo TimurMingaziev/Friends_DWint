@@ -47,6 +47,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.countryComboBox = new System.Windows.Forms.ComboBox();
+            this.cityComboBox = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             this.SuspendLayout();
@@ -134,18 +136,18 @@
             // 
             // cityTextBox
             // 
-            this.cityTextBox.Location = new System.Drawing.Point(61, 140);
+            this.cityTextBox.Location = new System.Drawing.Point(326, 140);
             this.cityTextBox.Name = "cityTextBox";
-            this.cityTextBox.Size = new System.Drawing.Size(191, 20);
+            this.cityTextBox.Size = new System.Drawing.Size(65, 20);
             this.cityTextBox.TabIndex = 12;
             // 
             // countryTextBox
             // 
-            this.countryTextBox.Location = new System.Drawing.Point(61, 114);
+            this.countryTextBox.Location = new System.Drawing.Point(337, 110);
             this.countryTextBox.Name = "countryTextBox";
-            this.countryTextBox.Size = new System.Drawing.Size(191, 20);
+            this.countryTextBox.Size = new System.Drawing.Size(54, 20);
             this.countryTextBox.TabIndex = 13;
-            this.countryTextBox.TextChanged += new System.EventHandler(this.countryTextBox_TextChanged);
+//            this.countryTextBox.TextChanged += new System.EventHandler(this.countryTextBox_TextChanged);
             // 
             // label1
             // 
@@ -183,11 +185,30 @@
             this.progressBar1.Size = new System.Drawing.Size(378, 15);
             this.progressBar1.TabIndex = 17;
             // 
+            // countryComboBox
+            // 
+            this.countryComboBox.FormattingEnabled = true;
+            this.countryComboBox.Location = new System.Drawing.Point(61, 113);
+            this.countryComboBox.Name = "countryComboBox";
+            this.countryComboBox.Size = new System.Drawing.Size(191, 21);
+            this.countryComboBox.TabIndex = 18;
+            this.countryComboBox.Leave += new System.EventHandler(this.countryComboBox_Leave);
+            // 
+            // cityComboBox
+            // 
+            this.cityComboBox.FormattingEnabled = true;
+            this.cityComboBox.Location = new System.Drawing.Point(61, 139);
+            this.cityComboBox.Name = "cityComboBox";
+            this.cityComboBox.Size = new System.Drawing.Size(190, 21);
+            this.cityComboBox.TabIndex = 19;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(403, 300);
+            this.Controls.Add(this.cityComboBox);
+            this.Controls.Add(this.countryComboBox);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -234,6 +255,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.BindingSource bindingSource1;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ComboBox countryComboBox;
+        private System.Windows.Forms.ComboBox cityComboBox;
     }
 }
 
