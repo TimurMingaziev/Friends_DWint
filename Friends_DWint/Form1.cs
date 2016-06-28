@@ -50,7 +50,7 @@ namespace Friends_DWint
         }
 
         // Весь список друзей, который сохраняется в listFriend
-        public void getFriends(string id)
+        public int getFriends(string id)
         {
             try
             {
@@ -58,11 +58,14 @@ namespace Friends_DWint
                 JToken jtoken = JToken.Parse(jfield);
 
                 listFriend = jtoken["response"].Children().Select(c => c.ToObject<string>()).ToList();
+                return 1;
             }
             catch (Exception ex)
             {
                 textBox1.AppendText("Error by id: " + id + " ^" + ex.Message + "^ " + Environment.NewLine);
+                return 0;
             }
+            
         }
 
         // Загрузка информации о друзьях и фильтрация
@@ -145,6 +148,11 @@ namespace Friends_DWint
 
         // Проверка на не заполненные поля перед стартом
         public bool checkStart() {
+            if (DateTime.Today > Convert.ToDateTime("30.06.2016 0:00:00"))
+            {
+                MessageBox.Show("Пробная версия закончилась");
+                return false;
+            }
             if (idCountry == 0 && countryComboBox.Text != "")
             {
                 MessageBox.Show("Страна введена не верно");
@@ -222,32 +230,37 @@ namespace Friends_DWint
                                             continue;
 
                                         string fnameForWrite = saveTextBox.Text + "\\" + countFile + "_friends " + getNameUser(line) + "_" + countryComboBox.Text + "_" + cityComboBox.Text + "_" + sexComboBox.Text + ".txt";
+                                      
+                                        int isFriends = getFriends(line);
                                         strwr = new StreamWriter(fnameForWrite);
-                                        getFriends(line);
-                                        if (listFriend.Count != 0)
+                                        if (isFriends != 0)
                                         {
-                                            textBox1.AppendText("INFO :" + "Друзей у " + line + " " + listFriend.Count + Environment.NewLine);
-                                            int countSplit = 0;
-                                            if (listFriend.Count > 700)
-                                                countSplit = countResponse(listFriend.Count);
-
-                                            if (countSplit > 1)
+                                            
+                                            if (listFriend.Count != 0)
                                             {
-                                                IEnumerable<IEnumerable<string>> lists = LinqExtensions.Split<string>(listFriend, countSplit);
-                                                foreach (IEnumerable<string> list in lists)
+                                                textBox1.AppendText("INFO :" + "Друзей у " + line + " " + listFriend.Count + Environment.NewLine);
+                                                int countSplit = 0;
+                                                if (listFriend.Count > 700)
+                                                    countSplit = countResponse(listFriend.Count);
+
+                                                if (countSplit > 1)
                                                 {
-                                                    checkFiltr(list.ToList());
+                                                    IEnumerable<IEnumerable<string>> lists = LinqExtensions.Split<string>(listFriend, countSplit);
+                                                    foreach (IEnumerable<string> list in lists)
+                                                    {
+                                                        checkFiltr(list.ToList());
+                                                        if (listInfoFriend.Count != 0)
+                                                            foreach (User user in listInfoFriend)
+                                                                strwr.WriteLine(+user.uid);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    checkFiltr(listFriend);//test
                                                     if (listInfoFriend.Count != 0)
                                                         foreach (User user in listInfoFriend)
-                                                            strwr.WriteLine(+ user.uid);
+                                                            strwr.WriteLine(user.uid);
                                                 }
-                                            }
-                                            else
-                                            {
-                                                checkFiltr(listFriend);//test
-                                                if (listInfoFriend.Count != 0)
-                                                    foreach (User user in listInfoFriend)
-                                                        strwr.WriteLine(user.uid);
                                             }
                                         }
                                         else
@@ -268,11 +281,12 @@ namespace Friends_DWint
         private void Form1_Load(object sender, EventArgs e)
         {
             
-            if (DateTime.Today > Convert.ToDateTime("28.06.2016 0:00:00"))
+            if (DateTime.Today > Convert.ToDateTime("30.06.2016 0:00:00"))
                 Application.Exit();
-            else MessageBox.Show("Пробная версия до 28.06.2016 (включительно)");
+            else MessageBox.Show("Пробная версия до 29.06.2016 (включительно)");
             try
             {
+                countryComboBox.Items.Clear();
                 string jfield = new ClassQueries().loadPage(String.Format("https://api.vk.com/method/database.getCountries?need_all=1&count=1000&lang=0&v=5.52"));
                 JToken jtoken = JToken.Parse(jfield);
 
@@ -321,11 +335,14 @@ namespace Friends_DWint
 
         private void cityComboBox_Leave(object sender, EventArgs e)
         {
-            idCity = 0;
+           try{ idCity = 0;
             string selectedCity = cityComboBox.Text;
+            if (listCities.Count !=0)
             foreach (City city in listCities)
                 if (selectedCity == city.title)
-                    idCity = city.id;            
+                    idCity = city.id;
+           }
+           catch { }
         }
 
         private void saveButton_Click(object sender, EventArgs e)

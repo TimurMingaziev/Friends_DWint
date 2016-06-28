@@ -73,7 +73,7 @@
             this.loadButton.Name = "loadButton";
             this.loadButton.Size = new System.Drawing.Size(132, 23);
             this.loadButton.TabIndex = 1;
-            this.loadButton.Text = "Откуда высасать";
+            this.loadButton.Text = "Откуда высАсать";
             this.loadButton.UseVisualStyleBackColor = true;
             this.loadButton.Click += new System.EventHandler(this.loadButton_Click);
             // 
@@ -83,7 +83,7 @@
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(132, 23);
             this.saveButton.TabIndex = 2;
-            this.saveButton.Text = "Куда высасать";
+            this.saveButton.Text = "Куда высАсать";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
@@ -127,7 +127,6 @@
             this.sexComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.sexComboBox.FormattingEnabled = true;
             this.sexComboBox.Items.AddRange(new object[] {
-            "",
             "мужской",
             "женский"});
             this.sexComboBox.Location = new System.Drawing.Point(61, 166);
